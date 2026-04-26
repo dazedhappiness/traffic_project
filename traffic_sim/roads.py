@@ -1,6 +1,8 @@
 class Road:
-    def __init__(self, name, length, capacity):
+    def __init__(self, name, start_node, end_node, length, capacity):
         self.name = name
+        self.start_node = start_node
+        self.end_node = end_node
         self.length = length
         self.capacity = capacity
         self.vehicles = []
