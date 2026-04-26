@@ -5,6 +5,23 @@ from traffic_sim.roads import Road
 from traffic_sim.junctions import Junction
 from traffic_sim.vehicles import Vehicle
 
+def compute_path(source, dest):
+    graph = {
+        "J1": {"J2": "R1"},
+        "J2": {"J3": "R2"},
+        "J3": {}
+    }
+
+    path = []
+    current = source
+
+    while current != dest:
+        next_node = list(graph[current].keys())[0]
+        path.append(graph[current][next_node])
+        current = next_node
+
+    return path
+    
 def main():
     engine = SimulationEngine()
     
@@ -36,7 +53,8 @@ def main():
     for step in range(total_steps):
         if step % 3 == 0 and len(r1.vehicles) < r1.capacity:
             vid = f"V{step}"
-            v = Vehicle(vid, source="J1", destination="J3", path=["R2"], speed=2)
+            path = compute_path("J1", "J3")
+            v = Vehicle(vid, source="J1", destination="J3", path=path, speed=2)
             r1.add_vehicle(v)
         
         engine.tick()
@@ -81,6 +99,7 @@ def main():
     ani.save('simulation_output.gif', writer='pillow')
     
     print(f"Throughput: {arrived_vehicles} vehicles")
+
 
 if __name__ == "__main__":
     main()
