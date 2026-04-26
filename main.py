@@ -55,7 +55,7 @@ def main():
     for step in range(total_steps):
         if step % 3 == 0 and len(r1.vehicles) < r1.capacity:
             vid = f"V{step}"
-            path = compute_path("J1", "J3")
+            path = compute_path("J1", "J3")[1:]
             v = Vehicle(vid, source="J1", destination="J3", path=path, speed=2)
             r1.add_vehicle(v)
             total_spawned += 1
