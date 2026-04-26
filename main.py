@@ -23,6 +23,7 @@ def compute_path(source, dest):
     return path
     
 def main():
+    total_spawned = 0
     engine = SimulationEngine()
     
     j1 = Junction("J1", 0, 5)
@@ -49,6 +50,7 @@ def main():
     frames_data = []
     total_steps = 30
     arrived_vehicles = 0
+    total_spawned += 1
     
     for step in range(total_steps):
         if step % 3 == 0 and len(r1.vehicles) < r1.capacity:
@@ -56,6 +58,7 @@ def main():
             path = compute_path("J1", "J3")
             v = Vehicle(vid, source="J1", destination="J3", path=path, speed=2)
             r1.add_vehicle(v)
+            total_spawned += 1
         
         engine.tick()
         
@@ -71,10 +74,14 @@ def main():
                 current_frame_vehicles.append((x, y, v.color))
                 
         frames_data.append(current_frame_vehicles)
+
+        completed_ids = set()
         
         for v in r2.vehicles:
             if v.position_on_road >= r2.length and not v.path:
-                arrived_vehicles += 1
+                if v.vid not in completed_ids:
+                    arrived_vehicles += 1
+                    completed_ids.add(v.vid)
 
     def update(frame_idx):
         ax.clear()
@@ -97,8 +104,10 @@ def main():
             
     ani = animation.FuncAnimation(fig, update, frames=total_steps, interval=200)
     ani.save('simulation_output.gif', writer='pillow')
-    
+
     print(f"Throughput: {arrived_vehicles} vehicles")
+    print(f"Spawned: {total_spawned} vehicles")
+    print(f"Completion Rate: {arrived_vehicles/total_spawned:.2f}")
 
 
 if __name__ == "__main__":
