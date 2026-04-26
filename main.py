@@ -50,7 +50,7 @@ def main():
     frames_data = []
     total_steps = 30
     arrived_vehicles = 0
-    total_spawned += 1
+    completed_ids = set()
     
     for step in range(total_steps):
         if step % 3 == 0 and len(r1.vehicles) < r1.capacity:
@@ -75,7 +75,7 @@ def main():
                 
         frames_data.append(current_frame_vehicles)
 
-        completed_ids = set()
+        
         
         for v in r2.vehicles:
             if v.position_on_road >= r2.length and not v.path:
