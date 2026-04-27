@@ -21,7 +21,24 @@ def compute_path(source, dest):
         current = next_node
 
     return path
-    
+
+class Source:
+    def __init__(self, road, rate):
+        self.road = road
+        self.rate = rate
+
+    def generate(self, step):
+        if step % self.rate == 0 and len(self.road.vehicles) < self.road.capacity:
+            return True
+        return False
+
+class Sink:
+    def __init__(self):
+        self.completed = 0
+
+    def record(self, vehicle):
+        self.completed += 1
+
 def main():
     total_spawned = 0
     engine = SimulationEngine()
@@ -45,15 +62,17 @@ def main():
     j2.add_incoming(r1)
     j2.add_outgoing(r2)
     j3.add_incoming(r2)
+
+    source = Source(r1, rate=3)
+    sink = Sink()
     
     fig, ax = plt.subplots(figsize=(8, 4))
     frames_data = []
     total_steps = 30
-    arrived_vehicles = 0
     completed_ids = set()
     
     for step in range(total_steps):
-        if step % 3 == 0 and len(r1.vehicles) < r1.capacity:
+        if source.generate(step):
             vid = f"V{step}"
             path = compute_path("J1", "J3")[1:]
             v = Vehicle(vid, source="J1", destination="J3", path=path, speed=2)
@@ -75,12 +94,10 @@ def main():
                 
         frames_data.append(current_frame_vehicles)
 
-        
-        
         for v in r2.vehicles:
             if v.position_on_road >= r2.length and not v.path:
                 if v.vid not in completed_ids:
-                    arrived_vehicles += 1
+                    sink.record(v)
                     completed_ids.add(v.vid)
 
     def update(frame_idx):
@@ -104,6 +121,8 @@ def main():
             
     ani = animation.FuncAnimation(fig, update, frames=total_steps, interval=200)
     ani.save('simulation_output.gif', writer='pillow')
+
+    arrived_vehicles = sink.completed
 
     print(f"Throughput: {arrived_vehicles} vehicles")
     print(f"Spawned: {total_spawned} vehicles")
