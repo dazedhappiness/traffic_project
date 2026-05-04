@@ -21,7 +21,8 @@ class Road:
             vehicle.current_road = None
 
     def update(self, current_time):
-        for vehicle in self.vehicles:
+        for vehicle in list(self.vehicles):
             vehicle.move()
+
             if vehicle.position_on_road >= self.length:
                 vehicle.position_on_road = self.length
